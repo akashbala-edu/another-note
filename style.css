@@ -1,8 +1,8 @@
-@font-face { font-family: "Jersey 10"; src: url("fonts/jersey-10-latin-400-normal.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; size-adjust: 122%; }
-@font-face { font-family: "Press Start 2P"; src: url("fonts/press-start-2p-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Nunito"; src: url("fonts/nunito-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Nunito"; src: url("fonts/nunito-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: "Nunito"; src: url("fonts/nunito-latin-800-normal.woff2") format("woff2"); font-weight: 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Jersey 10"; src: url("jersey-10-latin-400-normal.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; size-adjust: 122%; }
+@font-face { font-family: "Press Start 2P"; src: url("press-start-2p-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Nunito"; src: url("nunito-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Nunito"; src: url("nunito-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "Nunito"; src: url("nunito-latin-800-normal.woff2") format("woff2"); font-weight: 800; font-style: normal; font-display: swap; }
 
 /* Layout: one centered column (max 560px) of pixel-framed panels on a royal blue checker ground.
    Pixel world for frames, headings and buttons; game boards stay crisp so play feels like the originals. */

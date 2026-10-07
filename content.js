@@ -43,14 +43,14 @@ window.CONTENT = {
 
   // ---------- MEMORY MATCH ----------
   photos: [
-    ["photos/1.jpg", "i love you"],
-    ["photos/2.jpg", "under the night sky"],
-    ["photos/3.jpg", "yeah i mog"],
-    ["photos/4.jpg", "the bite."],
-    ["photos/5.jpg", "jigsaw puzzle"],
-    ["photos/6.jpg", "our dirty mirror"],
-    ["photos/7.jpg", "hop the fence"],
-    ["photos/8.jpg", "us."]
+    ["1.jpg", "i love you"],
+    ["2.jpg", "under the night sky"],
+    ["3.jpg", "yeah i mog"],
+    ["4.jpg", "the bite."],
+    ["5.jpg", "jigsaw puzzle"],
+    ["6.jpg", "our dirty mirror"],
+    ["7.jpg", "hop the fence"],
+    ["8.jpg", "us."]
   ],
 
   // ---------- PINPOINT ----------
