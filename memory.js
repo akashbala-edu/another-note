@@ -3,6 +3,24 @@
   const C = window.CONTENT;
   const STAR = ["...#...", "...#...", "..###..", "#######", ".#####.", "..###..", ".##.##.", "##...##"];
 
+  // shrink a caption until it fits its box: max 2 lines on the polaroid strip, never split a word
+  function fitText(el, maxPx, minPx) {
+    const box = el; if (!box.clientWidth || !box.clientHeight) return;
+    let size = maxPx;
+    el.style.fontSize = size + "px";
+    while (size > minPx && (el.scrollHeight > el.clientHeight + 0.5 || el.scrollWidth > el.clientWidth + 0.5)) {
+      size -= 0.5; el.style.fontSize = size + "px";
+    }
+  }
+  function fitAll(grid) {
+    grid.querySelectorAll(".mm-card").forEach(card => {
+      const w = card.clientWidth; if (!w) return;
+      const cap = card.querySelector(".cap"), big = card.querySelector(".capbig");
+      if (cap && cap.offsetParent !== null) fitText(cap, Math.min(18, Math.max(12, w * 0.16)), 8);
+      if (big) fitText(big, Math.min(26, Math.max(13, w * 0.17)), 8);
+    });
+  }
+
   App.register("memory", function (body, root, level) {
     const S = App.Store.data;
     const back = App.px(App.HEART, { "#": "#ffd60a" });
@@ -48,25 +66,37 @@
         grid.appendChild(b);
       });
 
+      // size every caption to its card, and again whenever the window changes size
+      const refit = () => fitAll(grid);
+      requestAnimationFrame(refit);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+      const ro = window.ResizeObserver ? new ResizeObserver(() => refit()) : null;
+      if (ro) ro.observe(grid);
+      App.onLeave(() => { clearTimeout(swapT); ro && ro.disconnect(); });
+
+      // once a card has finished turning, drop the 3D transform so its text renders sharp
+      const faceUp = (b) => { b.classList.add("up"); setTimeout(() => { if (b.classList.contains("up") || b.classList.contains("done")) b.classList.add("flat"); }, 560); };
+      const faceDown = (b) => { b.classList.remove("flat"); requestAnimationFrame(() => requestAnimationFrame(() => b.classList.remove("up"))); };
+
       const label = (b) => b.classList.contains("is-cap") ? "Caption: " + PH[b.dataset.k][1] : (captionMode && !b.classList.contains("done") ? "Photo" : PH[b.dataset.k][1]);
 
       function flip(b) {
         if (lock || b.classList.contains("up") || b.classList.contains("done") || b.classList.contains("swapping")) return;
-        b.classList.add("up"); b.setAttribute("aria-label", label(b));
+        faceUp(b); b.setAttribute("aria-label", label(b));
         open.push(b);
         if (open.length < 2) return;
         flips++; upd();
         const [a, c] = open;
         if (a.dataset.k === c.dataset.k) {
           setTimeout(() => {
-            [a, c].forEach(x => { x.classList.remove("up"); x.classList.add("done"); x.setAttribute("aria-label", PH[x.dataset.k][1]); });
+            [a, c].forEach(x => { x.classList.add("done"); x.classList.remove("up"); x.classList.add("flat"); x.setAttribute("aria-label", PH[x.dataset.k][1]); });
             open = []; found++; upd();
             if (found === PH.length) setTimeout(finish, 600);
           }, 420);
         } else {
           lock = true; misses++;
           setTimeout(() => {
-            [a, c].forEach(x => { x.classList.remove("up"); x.setAttribute("aria-label", "Hidden card"); });
+            [a, c].forEach(x => { faceDown(x); x.setAttribute("aria-label", "Hidden card"); });
             open = [];
             if (spicy && misses % SWAP_EVERY === 0) swapTwo();
             else lock = false;

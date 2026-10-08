@@ -370,6 +370,8 @@ window.App = (function () {
       setTimeout(() => toast("Everything's reset. Have fun :)"), 300);
     }
     document.addEventListener("pointerdown", () => Sound.unlock(), { once: true });
+    document.addEventListener("pointerdown", () => document.body.classList.add("pointer"), true);
+    document.addEventListener("keydown", (e) => { if (e.key === "Tab") document.body.classList.remove("pointer"); }, true);
     welcome();
   }
 

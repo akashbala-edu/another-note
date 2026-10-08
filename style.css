@@ -222,7 +222,7 @@ button { font: inherit; color: inherit; }
 .mm-pips i { flex: 1; height: 8px; background: rgba(255,255,255,.15); }
 .mm-pips i.on { background: var(--sun); }
 .mm-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; perspective: 900px; }
-.mm-card { aspect-ratio: 3 / 4.5; max-width: 100%; border: 0; padding: 0; background: none; cursor: pointer; position: relative; }
+.mm-card { aspect-ratio: 3 / 4.75; max-width: 100%; border: 0; padding: 0; background: none; cursor: pointer; position: relative; }
 .mm-card:focus-visible { outline: 3px dashed var(--sun); outline-offset: 3px; }
 .mm-inner { position: absolute; inset: 0; transition: transform .5s cubic-bezier(.3,1.3,.5,1); transform-style: preserve-3d; }
 .mm-card.up .mm-inner, .mm-card.done .mm-inner { transform: rotateY(180deg); }
@@ -232,9 +232,9 @@ button { font: inherit; color: inherit; }
   box-shadow: inset 0 0 0 3px var(--ink), inset 0 0 0 6px var(--royal-3);
 }
 .mm-back svg { width: 38%; shape-rendering: crispEdges; }
-.mm-front { transform: rotateY(180deg); background: var(--paper); padding: 7% 7% 0; display: flex; flex-direction: column; box-shadow: inset 0 0 0 3px var(--ink); container-type: inline-size; }
+.mm-front { transform: rotateY(180deg); background: var(--paper); padding: 6% 6% 0; display: flex; flex-direction: column; box-shadow: inset 0 0 0 3px var(--ink); container-type: inline-size; }
 .mm-front img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; image-rendering: auto; }
-.mm-front .cap { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; font-family: var(--ui); color: var(--ink); font-size: clamp(11.5px, 13.5cqw, 17px); text-align: center; line-height: 1.05; padding: 4% 8% 7%; overflow: hidden; overflow-wrap: anywhere; }
+.mm-front .cap { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; font-family: var(--ui); color: var(--ink); font-size: 14px; text-align: center; line-height: 1.02; padding: 3% 9% max(9%, 8px); overflow: hidden; overflow-wrap: normal; word-break: normal; }
 .mm-card.done .mm-front { box-shadow: inset 0 0 0 3px var(--sun-2), 0 0 0 3px var(--sun), 0 0 16px rgba(255,214,10,.5); }
 .mm-card.done { cursor: default; }
 
@@ -372,7 +372,7 @@ button { font: inherit; color: inherit; }
 
 .g-memory .mm-stats { flex: none; margin-top: 4px; }
 .mm-area { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
-.mm-grid { width: min(100%, calc(0.667 * (100vh - var(--mm-top, 215px)) + 20px)); width: min(100%, calc(0.667 * (100dvh - var(--mm-top, 215px)) + 20px)); }
+.mm-grid { width: min(100%, calc(0.632 * (100vh - var(--mm-top, 215px)) + 20px)); width: min(100%, calc(0.632 * (100dvh - var(--mm-top, 215px)) + 20px)); }
 
 .g-pinpoint .game-body { justify-content: center; }
 .g-pinpoint .pp-clue { padding: 10px 14px; }
@@ -460,14 +460,19 @@ button { font: inherit; color: inherit; }
 .mm-front.photo-only { padding: 7%; }
 .mm-front.photo-only img { height: 100%; aspect-ratio: auto; }
 .mm-front.photo-only .cap { display: none; }
-.mm-card.done .mm-front.photo-only { padding: 7% 7% 0; }
-.mm-card.done .mm-front.photo-only img { height: auto; aspect-ratio: 1; }
-.mm-card.done .mm-front.photo-only .cap { display: flex; }
 .cap-card { display: flex; align-items: center; justify-content: center; padding: 10%; background: #fff6d6; }
-.capbig { font-family: var(--ui); color: var(--ink); text-align: center; line-height: 1.1; font-size: clamp(13px, 17cqw, 24px); overflow-wrap: anywhere; letter-spacing: .02em; }
+.capbig { font-family: var(--ui); color: var(--ink); text-align: center; line-height: 1.1; font-size: 18px; overflow: hidden; overflow-wrap: normal; letter-spacing: .02em; height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; }
 .cap-card { container-type: inline-size; }
 
 /* the swap shake */
 .mm-card.swapping { animation: swapShake .65s steps(6); z-index: 2; }
 .mm-card.swapping .mm-back { box-shadow: inset 0 0 0 3px var(--sun), inset 0 0 0 6px var(--royal-3); }
 @keyframes swapShake { 0%, 100% { transform: none; } 20% { transform: translateX(-5px) rotate(-3deg); } 40% { transform: translateX(5px) rotate(3deg); } 60% { transform: translateX(-4px) rotate(-2deg); } 80% { transform: translateX(4px) rotate(2deg); } }
+
+/* sharp text: a card that has finished flipping is drawn flat, no 3D */
+.mm-card.flat .mm-inner { transform: none !important; transition: none; transform-style: flat; }
+.mm-card.flat .mm-back { visibility: hidden; }
+.mm-card.flat .mm-front { transform: none; backface-visibility: visible; -webkit-backface-visibility: visible; }
+.mm-front .cap, .capbig { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+/* no focus ring after a tap or click, keep it for keyboard */
+body.pointer .mm-card:focus-visible, body.pointer .tile:focus-visible, body.pointer .btn:focus-visible { outline: none; }
