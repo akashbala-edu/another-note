@@ -8,7 +8,9 @@ window.App = (function () {
   /* ---------- saved progress ---------- */
   const fresh = () => ({
     done: {}, wordleFound: [], ppFound: [], qSolved: [], ptSolved: [],
-    mmBest: null, chestOpened: false, last: {}, muted: false, bags: {}, seenHow: {}
+    mmBest: null, chestOpened: false, last: {}, muted: false, bags: {}, seenHow: {},
+    wordle2Found: [], mmDone2: false, mmDone3: false, mmBest2: null, mmBest3: null, mmStars2: 0, mmStars3: 0,
+    level: {}, unlockSeen: {}
   });
   const Store = {
     data: fresh(),
@@ -212,11 +214,51 @@ window.App = (function () {
     patches: px(["aaabbbbb", "aaabbbbb", "aaabbbbb", "ccddddee", "ccddddee", "ccffffee", "ccffffee", "ccffffee"], { a: "#ffb3c7", b: "#96beff", c: "#ffe98a", d: "#b3dfa0", e: "#bba3e2", f: "#ffc992" })
   };
 
+  /* ---------- levels (Wordle 1-2, Memory 1-3) ---------- */
+  const Levels = {
+    max(game) {
+      const d = Store.data;
+      if (game === "wordle") return C.wordle.every(([w]) => d.wordleFound.includes(w)) ? 2 : 1;
+      if (game === "memory") return d.done.memory ? (d.mmDone2 ? 3 : 2) : 1;
+      return 1;
+    },
+    current(game) {
+      const m = this.max(game), l = Store.data.level[game] || 1;
+      return Math.min(Math.max(1, l), m);
+    },
+    set(game, l) { Store.data.level[game] = l; Store.save(); },
+    pending(game) { // a newly unlocked level she hasn't been told about yet
+      const m = this.max(game);
+      return m > 1 && !Store.data.unlockSeen[game + m] ? m : 0;
+    },
+    unlockHTML(game, l) {
+      const lines = C.unlock[game + l] || [];
+      const rules = game === "memory" ? (l === 2 ? C.memoryRules2 : C.memoryRules3) : null;
+      return `<div class="kicker">NEW LEVEL UNLOCKED</div>
+        ${lines.map((t, i) => `<p class="${i ? "spice" : ""}">${t}</p>`).join("")}
+        ${rules ? `<ul class="rules">${rules.map(r => `<li>${r}</li>`).join("")}</ul>` : ""}
+        <div class="row-btns"><button class="btn" data-a="level">Level ${l}</button></div>`;
+    },
+    wireUnlock(m, game, l) {
+      Store.data.unlockSeen[game + l] = true; Store.data.level[game] = l; Store.save();
+      m.el.querySelector('[data-a="level"]').onclick = () => { Sound.start(); show(game); };
+    },
+    popup(game, l) {
+      const m = modal(this.unlockHTML(game, l));
+      this.wireUnlock(m, game, l);
+      Sound.win();
+      return m;
+    }
+  };
+  const starsText = (n) => n ? `${n} ${n === 1 ? "star" : "stars"}` : "";
+
   function counters() {
     const d = Store.data;
+    const wl = Levels.max("wordle"), ml = Levels.max("memory");
+    const mBest = ml === 3 ? (d.mmStars3 || 0) : (d.mmStars2 || 0);
     return {
-      wordle: d.done.wordle ? `${d.wordleFound.length} of ${C.wordle.length} words found` : "Guess the word",
-      memory: d.done.memory ? (d.mmBest ? `Best: ${d.mmBest} flips` : "Done") : "Find the pairs",
+      wordle: wl === 2 ? `Level 2 · ${d.wordle2Found.length} of ${C.wordle2.length} words` : (d.done.wordle ? `${d.wordleFound.length} of ${C.wordle.length} words found` : "Guess the word"),
+      memory: ml > 1 ? `Level ${ml}${mBest ? " · best " + starsText(mBest) : ""}` : (d.done.memory ? (d.mmBest ? `Best: ${d.mmBest} flips` : "Done") : "Find the pairs"),
       pinpoint: d.done.pinpoint ? `${d.ppFound.length} of ${C.pinpoint.length} solved` : "Guess the link",
       queens: d.done.queens ? `${d.qSolved.length} of ${QUEENS.length} solved` : "One heart per row",
       patches: d.done.patches ? `${d.ptSolved.length} of ${PATCHES.length} solved` : "Fill the grid"
@@ -293,13 +335,22 @@ window.App = (function () {
     if (name === "welcome") return welcome();
     if (name === "hub") return hub();
     if (games[name]) {
-      const root = mount(`<section class="screen game g-${name}">${topbar(NAMES[name].toUpperCase(), name === "queens" || name === "patches", true)}<div class="game-body"></div></section>`);
+      const pend = Levels.pending(name);
+      if (pend) Levels.set(name, pend);
+      const maxL = Levels.max(name), cur = Levels.current(name);
+      const tabs = maxL > 1 ? `<div class="lvl-tabs" role="tablist">${[...Array(maxL).keys()].map(i => `<button class="lvl ${i + 1 === cur ? "on" : ""}" role="tab" aria-selected="${i + 1 === cur}" data-l="${i + 1}">Level ${i + 1}</button>`).join("")}</div>` : "";
+      const root = mount(`<section class="screen game g-${name} ${tabs ? "has-levels" : ""} lvl-${cur}">${topbar(NAMES[name].toUpperCase(), name === "queens" || name === "patches", true)}${tabs}<div class="game-body"></div></section>`);
       wireTopbar(root);
-      games[name](root.querySelector(".game-body"), root);
-      const help = () => modal(`<div class="kicker">HOW TO PLAY</div><h2>${NAMES[name]}</h2><p class="how">${HOWTO[name]}</p>
+      root.querySelectorAll(".lvl").forEach(b => b.onclick = () => { if (+b.dataset.l !== cur) { Levels.set(name, +b.dataset.l); show(name); } });
+      games[name](root.querySelector(".game-body"), root, cur);
+      const help = () => {
+        const extra = name === "memory" && cur > 1 ? `<ul class="rules">${(cur === 2 ? C.memoryRules2 : C.memoryRules3).map(r => `<li>${r}</li>`).join("")}</ul>` : "";
+        return modal(`<div class="kicker">HOW TO PLAY${cur > 1 ? " · LEVEL " + cur : ""}</div><h2>${NAMES[name]}</h2><p class="how">${HOWTO[name]}</p>${extra}
         <div class="row-btns"><button class="btn small" data-close>Got it</button></div>`, { dismiss: true });
+      };
       root.querySelector('[data-act="help"]').onclick = help;
-      if (!Store.data.seenHow[name]) { Store.data.seenHow[name] = true; Store.save(); help(); }
+      if (pend) Levels.popup(name, pend);
+      else if (!Store.data.seenHow[name]) { Store.data.seenHow[name] = true; Store.save(); help(); }
     }
   }
 
@@ -322,5 +373,5 @@ window.App = (function () {
     welcome();
   }
 
-  return { boot, show, register, win, Store, Sound, toast, shuffle, pick, pickIndex, makeTimer, onLeave, heartSVG, px, HEART, drawChest, allDone, modal, C };
+  return { boot, show, register, win, Store, Sound, toast, shuffle, pick, pickIndex, makeTimer, onLeave, heartSVG, px, HEART, drawChest, allDone, modal, Levels, C };
 })();

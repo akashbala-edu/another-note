@@ -6,7 +6,7 @@
     if (DICT || dictLoading) return dictLoading;
     dictLoading = fetch("words.txt").then(r => r.ok ? r.text() : Promise.reject()).then(t => {
       const s = new Set(); for (let i = 0; i + 5 <= t.length; i += 5) s.add(t.slice(i, i + 5).toUpperCase());
-      C.wordle.forEach(([w]) => s.add(w)); DICT = s;
+      C.wordle.concat(C.wordle2 || []).forEach(([w]) => s.add(w)); DICT = s;
     }).catch(() => { DICT = "any"; });
     return dictLoading;
   }
@@ -22,18 +22,22 @@
     return res;
   }
 
-  App.register("wordle", function (body) {
+  App.register("wordle", function (body, root, level) {
     loadDict();
     const S = App.Store.data;
+    const L2 = level === 2;
+    const LIST = L2 ? C.wordle2 : C.wordle;
+    const found = () => L2 ? S.wordle2Found : S.wordleFound;
+    const bagKey = L2 ? "wordle2" : "wordle";
     let idx;
     const start = () => {
-      const solved = C.wordle.map((w, i) => i).filter(i => S.wordleFound.includes(C.wordle[i][0]));
-      idx = App.pickIndex("wordle", C.wordle.length, solved);
+      const solved = LIST.map((w, i) => i).filter(i => found().includes(LIST[i][0]));
+      idx = App.pickIndex(bagKey, LIST.length, solved);
       play();
     };
 
     function play() {
-      const [target, reason] = C.wordle[idx];
+      const [target, reason] = LIST[idx];
       let rows = [], cur = "", over = false, busy = false, hint = false, rounds = 0;
       const keyState = {};
 
@@ -119,21 +123,30 @@
       function won(rowEl) {
         over = true;
         [...rowEl.children].forEach((t, i) => setTimeout(() => t.classList.add("win"), i * 90));
-        const first = App.win("wordle");
-        if (!S.wordleFound.includes(target)) { S.wordleFound.push(target); App.Store.save(); }
+        const first = L2 ? false : App.win("wordle");
+        if (L2) App.Sound.win();
+        const list = found(), before = list.length;
+        if (!list.includes(target)) { list.push(target); App.Store.save(); }
+        const levelDone = before < LIST.length && list.length === LIST.length;
+        const unlock = !L2 && App.Levels.pending("wordle");
         const tries = rounds * 6 + rows.length;
         setTimeout(() => {
           const m = App.modal(`
-            <div class="kicker">${first ? "WORDLE CONQUERED" : "ANOTHER ONE"}</div>
+            <div class="kicker">${first ? "WORDLE CONQUERED" : (L2 ? "LEVEL 2" : "ANOTHER ONE")}</div>
             <h2>${target}</h2>
             <p>${reason}</p>
-            <div class="stat">Solved in ${tries} ${tries === 1 ? "try" : "tries"}<br>${S.wordleFound.length} of ${C.wordle.length} words found</div>
+            <div class="stat">Solved in ${tries} ${tries === 1 ? "try" : "tries"}<br>${list.length} of ${LIST.length} words found</div>
+            ${L2 && levelDone ? `<div class="line big">${C.wordleAllDone}</div>` : ""}
+            ${unlock ? `<div class="unlock-block">${App.Levels.unlockHTML("wordle", unlock)}</div>` : `
             <div class="row-btns">
               <button class="btn small" data-a="again">Another word</button>
               <button class="btn small blue" data-a="hub">Back to games</button>
-            </div>`, { closable: true });
-          m.el.querySelector('[data-a="hub"]').onclick = () => App.show("hub");
-          m.el.querySelector('[data-a="again"]').onclick = () => { m.close(); start(); };
+            </div>`}`, { closable: true });
+          if (unlock) App.Levels.wireUnlock(m, "wordle", unlock);
+          else {
+            m.el.querySelector('[data-a="hub"]').onclick = () => App.show("hub");
+            m.el.querySelector('[data-a="again"]').onclick = () => { m.close(); start(); };
+          }
         }, 1000);
       }
 

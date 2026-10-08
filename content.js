@@ -53,6 +53,62 @@ window.CONTENT = {
     ["8.jpg", "us."]
   ],
 
+  // ---------- LEVELS (added later) ----------
+  wordle2: [
+    ["NIGHT", "For all the nights we spent together."],
+    ["SWEET", "Because that's exactly what you are."],
+    ["BLUSH", "For every time I made you blush."],
+    ["LAUGH", "For all the times we laughed over the stupidest things."],
+    ["CLOSE", "For how close we've gotten."],
+    ["PEACE", "The peace you bring into my life."],
+    ["CHAOS", "And all the chaos that never lets us live."],
+    ["WORLD", "The one we're going to travel together."],
+    ["FAITH", "What we keep in each other."],
+    ["SLEEP", "For every night we lost sleep, and every night we fell asleep on video call."],
+    ["ADORE", "The way I absolutely adore you."],
+    ["PROUD", "For every time you make me proud."],
+    ["TEASE", "The way we never stop teasing each other."],
+    ["CRUSH", "What we keep developing on each other. Clock it."],
+    ["GRACE", "How graceful, soft and serene you are."],
+    ["AGAIN", "Somehow we find our way back, again and again."],
+    ["FOUND", "For finding each other when neither of us expected it."],
+    ["BLOCK", "You know it. D Block."],
+    ["BOOBS", "Of course this was going to be here."],
+    ["BOOTY", "Since boobs is here, why not this. P.S. Your booty da best."]
+  ],
+  photos2: [
+    ["9.jpg", "what a kiss"],
+    ["10.jpg", "hand as big as face"],
+    ["11.jpg", "reel, yt shorts addict"],
+    ["12.jpg", "head kissss"],
+    ["13.jpg", "gonna frame this"],
+    ["14.jpg", "me like kissing you"],
+    ["15.jpg", "eye to eye?"],
+    ["16.jpg", "yeah my gf hot"]
+  ],
+  photos3: [
+    ["17.jpg", "first time"],
+    ["18.jpg", "the iconic hickey"],
+    ["19.jpg", "GOAT of wordle"],
+    ["20.jpg", "wallpaper"],
+    ["21.jpg", "sleeping beauty"],
+    ["22.jpg", "daddy and mommy are hot."],
+    ["23.jpg", "always biting me"],
+    ["24.jpg", "shirt swap"]
+  ],
+  unlock: {
+    wordle2: ["Didn't expect you to finish it all so soon. Here's your reward for being so quick."],
+    memory2: ["Didn't expect you to finish it all so soon. Here's your reward for being so quick.",
+              "Since you find this so easy, let's add some spice."],
+    memory3: ["Okay, now you're just showing off. Fine. Final level, extra spicy."]
+  },
+  memoryRules2: ["Wrong cards flip back faster", "Every 3 wrong guesses, two cards secretly swap places", "Finish in fewer flips for 3 stars"],
+  memoryRules3: ["Half the cards are photos, half are captions", "Match each photo to its caption", "Still faster, still shuffling"],
+  swapTeases: ["Oops, those two just moved :)", "Keep up, genius.", "Did you blink?"],
+  starLines: ["Spicy enough for you? :)", "Not bad, not bad.", "Too easy for you, huh?"],
+  wordleAllDone: "All 36 words. You've officially beaten every word I could think of.",
+  memoryAllDone: "Every level, every memory. You win. You always do.",
+
   // ---------- PINPOINT ----------
   // keys: any guess containing one of these words counts as correct
   pinpoint: [

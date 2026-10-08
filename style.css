@@ -428,3 +428,46 @@ button { font: inherit; color: inherit; }
   .g-memory .mm-stats .s b { font-size: 18px; }
   .g-memory .mm-grid { gap: 8px; }
 }
+
+/* ================= levels ================= */
+.lvl-tabs { flex: none; display: flex; gap: 8px; justify-content: center; margin-top: -2px; }
+.lvl {
+  font-family: var(--ui); font-size: 17px; letter-spacing: .03em; color: var(--mist); background: var(--navy);
+  border: 0; padding: 6px 14px; cursor: pointer; margin: 3px;
+  box-shadow: 0 -3px 0 0 var(--ink), 0 3px 0 0 var(--ink), -3px 0 0 0 var(--ink), 3px 0 0 0 var(--ink);
+}
+.lvl.on { background: var(--sun); color: var(--ink); }
+.lvl:focus-visible { outline: 3px dashed var(--sun); outline-offset: 5px; }
+.has-levels.g-wordle .game-body {
+  --t: min(15vw, 62px, calc((100vh - 375px) / 6.6));
+  --t: min(15vw, 62px, calc((100dvh - 375px) / 6.6));
+}
+.has-levels.g-memory { --mm-top: 262px; }
+@media (max-height: 720px) { .has-levels.g-memory { --mm-top: 218px; } .lvl { padding: 4px 12px; font-size: 16px; } }
+
+.modal .spice { font-family: var(--ui); font-size: 22px; color: var(--royal); letter-spacing: .02em; }
+.modal .rules { margin: 2px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.modal .rules li { font-family: var(--ui); font-size: 18px; color: #24305e; letter-spacing: .02em; padding-left: 18px; position: relative; }
+.modal .rules li::before { content: ""; position: absolute; left: 2px; top: .42em; width: 8px; height: 8px; background: var(--sun-2); box-shadow: 0 0 0 2px var(--ink); }
+.unlock-block { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 6px; padding-top: 14px; border-top: 3px dashed #c7d1ff; width: 100%; }
+.stars { display: flex; gap: 8px; justify-content: center; }
+.stars svg { width: 34px; height: 34px; shape-rendering: crispEdges; }
+.stars svg.on { animation: popIn .35s steps(4) both; }
+.stars svg:nth-child(2) { animation-delay: .15s; }
+.stars svg:nth-child(3) { animation-delay: .3s; }
+
+/* level 3 cards */
+.mm-front.photo-only { padding: 7%; }
+.mm-front.photo-only img { height: 100%; aspect-ratio: auto; }
+.mm-front.photo-only .cap { display: none; }
+.mm-card.done .mm-front.photo-only { padding: 7% 7% 0; }
+.mm-card.done .mm-front.photo-only img { height: auto; aspect-ratio: 1; }
+.mm-card.done .mm-front.photo-only .cap { display: flex; }
+.cap-card { display: flex; align-items: center; justify-content: center; padding: 10%; background: #fff6d6; }
+.capbig { font-family: var(--ui); color: var(--ink); text-align: center; line-height: 1.1; font-size: clamp(13px, 17cqw, 24px); overflow-wrap: anywhere; letter-spacing: .02em; }
+.cap-card { container-type: inline-size; }
+
+/* the swap shake */
+.mm-card.swapping { animation: swapShake .65s steps(6); z-index: 2; }
+.mm-card.swapping .mm-back { box-shadow: inset 0 0 0 3px var(--sun), inset 0 0 0 6px var(--royal-3); }
+@keyframes swapShake { 0%, 100% { transform: none; } 20% { transform: translateX(-5px) rotate(-3deg); } 40% { transform: translateX(5px) rotate(3deg); } 60% { transform: translateX(-4px) rotate(-2deg); } 80% { transform: translateX(4px) rotate(2deg); } }
