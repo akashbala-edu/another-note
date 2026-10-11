@@ -10,7 +10,8 @@ window.App = (function () {
     done: {}, wordleFound: [], ppFound: [], qSolved: [], ptSolved: [],
     mmBest: null, chestOpened: false, last: {}, muted: false, bags: {}, seenHow: {},
     wordle2Found: [], mmDone2: false, mmDone3: false, mmBest2: null, mmBest3: null, mmStars2: 0, mmStars3: 0,
-    level: {}, unlockSeen: {}
+    level: {}, unlockSeen: {},
+    cs: null
   });
   const Store = {
     data: fresh(),
@@ -85,7 +86,8 @@ window.App = (function () {
         if (!ensure()) return;
         tone(N.C5, 0, .08, "square", .5); tone(N.G5, .07, .12, "square", .5);
       },
-      state() { return ctx ? ctx.state : "none"; }
+      state() { return ctx ? ctx.state : "none"; },
+      ctx() { return ensure() ? { ctx, master } : null; }
     };
   })();
 
@@ -175,12 +177,13 @@ window.App = (function () {
 
   const QMARK = [".###.", "#...#", "....#", "..##.", "..#..", ".....", "..#.."];
   function topbar(title, withTimer, withHelp) {
+    // three columns with equal sides, so the title always sits in the true centre
     return `<div class="topbar">
-      <button class="icon-btn" data-act="back" aria-label="Back to games">${px(BACK, { "#": "#c7d1ff" })}</button>
+      <div class="tb-l"><button class="icon-btn" data-act="back" aria-label="Back to games">${px(BACK, { "#": "#c7d1ff" })}</button>
+      ${withTimer ? '<div class="timer" aria-label="Timer">00:00</div>' : ""}</div>
       <div class="title">${title}</div>
-      ${withTimer ? '<div class="timer" aria-label="Timer">00:00</div>' : ""}
-      ${withHelp ? `<button class="icon-btn" data-act="help" aria-label="How to play">${px(QMARK, { "#": "#ffd60a" })}</button>` : ""}
-      <button class="icon-btn" data-act="mute" aria-label="Sound on or off">${Store.data.muted ? px(SPK_OFF, { "#": "#8fa0e6" }) : px(SPK_ON, { "#": "#c7d1ff" })}</button>
+      <div class="tb-r">${withHelp ? `<button class="icon-btn" data-act="help" aria-label="How to play">${px(QMARK, { "#": "#ffd60a" })}</button>` : ""}
+      <button class="icon-btn" data-act="mute" aria-label="Sound on or off">${Store.data.muted ? px(SPK_OFF, { "#": "#8fa0e6" }) : px(SPK_ON, { "#": "#c7d1ff" })}</button></div>
     </div>`;
   }
   function wireTopbar(root) {
@@ -301,6 +304,7 @@ window.App = (function () {
       <div class="tiles">
         ${tile("wordle")}${tile("memory")}${tile("pinpoint")}${tile("queens")}${tile("patches", true)}
       </div>
+      ${window.Case && Case.available() ? Case.tileHTML() : ""}
       <div class="hub-foot">Progress saves on this device.</div>
     </section>`);
     wireTopbar(root);
@@ -308,6 +312,7 @@ window.App = (function () {
     root.querySelectorAll("[data-game]").forEach(b => b.onclick = () => { Sound.start(); show(b.dataset.game); });
     const ch = root.querySelector("#chest");
     if (ch) { drawChest(ch.querySelector("canvas"), false); ch.onclick = () => Finale.open(); }
+    if (window.Case && Case.available()) Case.wireTile(root);
   }
 
   function drawChest(cv, open) {
@@ -334,6 +339,7 @@ window.App = (function () {
   function show(name) {
     if (name === "welcome") return welcome();
     if (name === "hub") return hub();
+    if (name === "case") return Case.open();
     if (games[name]) {
       const pend = Levels.pending(name);
       if (pend) Levels.set(name, pend);
@@ -375,5 +381,5 @@ window.App = (function () {
     welcome();
   }
 
-  return { boot, show, register, win, Store, Sound, toast, shuffle, pick, pickIndex, makeTimer, onLeave, heartSVG, px, HEART, drawChest, allDone, modal, Levels, C };
+  return { boot, show, register, win, Store, Sound, toast, shuffle, pick, pickIndex, makeTimer, onLeave, heartSVG, px, HEART, drawChest, allDone, modal, Levels, C, mount, topbar, wireTopbar };
 })();
